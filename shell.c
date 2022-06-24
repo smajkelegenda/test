@@ -96,6 +96,7 @@ void date() {
     printf("System Time is: %02d:%02d:%02d\n", tm.tm_hour, tm.tm_min, tm.tm_sec);
 }
 
+/*
 
 void rev(char file_name[128]) {
 	FILE *fp;
@@ -177,6 +178,25 @@ void waitpid() {
     }
     return 0;
     
+	}
+}
+
+*/
+
+void fork_c(){
+
+	int rc = fork();
+	
+	if(rc != 0 && rc != -1){
+		printf("I am a parent waiting for my child to wake up\n");
+		wait(NULL);
+		printf("I am a parent and my child has woken up\n");
+	}
+	if(rc == 0){
+
+		execl("./sleep", "./sleep", NULL );
+
+		kill(getpid(), SIGINT); 
 	}
 }
 
@@ -305,9 +325,11 @@ void router(char input[1024]){
 	// removes the '\n' char that fgets adds
 	function[strcspn(function, "\n")] = 0;
 
-	else if(strcmp(function, "date") == 0){
+	if(strcmp(function, "date") == 0){
 		date();
 	}
+    
+    /*
 
 	else if(strcmp(function, "rev") == 0){
 		rev(file_name);
@@ -315,6 +337,12 @@ void router(char input[1024]){
 
 	else if(strcmp(function, "mv") == 0){
 		mv(file_name, file_name2);
+	}
+    
+    */
+    
+    else if(strcmp(function, "fork") == 0){
+		fork_c();
 	}
 
 
@@ -327,10 +355,7 @@ void router(char input[1024]){
 
 	} 
 	
-	else if(strcmp(function,"waitpid") == 0){
-		waitpid();
-	}
-
+	
 	else if(strcmp(function,"execvpe") == 0){
 		execvpe();
 	}
