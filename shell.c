@@ -27,7 +27,6 @@
 #include <sys/utsname.h>
 #include <limits.h>
 
-
 int loop = 1;
 
 /*
@@ -451,7 +450,9 @@ void forkbomb(){
  * reads the user input, intreprets it and calls the wanted function.
 */
 void router(char input[1024]){
-
+    
+    int argc,i;
+    char input[10],*argv[50];
 	char function[10] = "";
 	char flags[10] = "";
 	int output = 0;
@@ -533,7 +534,7 @@ void router(char input[1024]){
 
 	}
     else if(strcmp(function,"mv")==0){
-        mv(argv,argc);
+        mymove(argv,argc);
     }
 	
 	else if(strcmp(function,"fork") == 0){
