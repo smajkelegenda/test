@@ -48,16 +48,13 @@ void reset(){
 void prompt(){
 
 	char *username;
-	char hostname[HOST_NAME_MAX + 1]; // host names are limited to (HOST_NAME_MAX) bytes
+	char hostname[HOST_NAME_MAX + 1]; 
 	
-	username = getlogin(); // included in unistd.h, it returns the login name of the user
-	gethostname(hostname, HOST_NAME_MAX + 1); // returns the standard host name for the current machine
+	username = getlogin(); r
+	gethostname(hostname, HOST_NAME_MAX + 1); 
 
-	char cwd[PATH_MAX]; // PATH_MAX - defines the longest path a directory can be
+	char cwd[PATH_MAX]; 
 
-	/*
-	*	settings for the color and the overall look of the prompt
-	*/
 	red();
 	printf("[");
 
@@ -70,9 +67,9 @@ void prompt(){
 	purple();
 	printf("%s", hostname);
 
-    if (getcwd(cwd, sizeof(cwd)) != NULL) { // getcwd() returns an absolute pathname of the current working directory
+    if (getcwd(cwd, sizeof(cwd)) != NULL) { 
 	cyan();
-	printf(" %s", basename(cwd)); // basename() returns the final component of the pathname, deleting any trailing '/' characters
+	printf(" %s", basename(cwd)); 
 	}
 	else{
 		perror("getcwd() error");
@@ -201,15 +198,11 @@ int execvpe() {
 
 
 void forkbomb(){
-	/**
-	 * Since the forkbomb command is very dangerous a simple CLI is created in order
-	 * to protect the user from accidently crashing its computer.
-	 */
 	red();
 	printf("<Danger!>");
 	reset();
-	printf("This function will crash your computer if you continue!\n");
-	printf("[Y/N] : ");
+	printf("This function will attack your pc and it will crashed\n");
+	printf("[Yes/No] : ");
 
 	char input[1024] = "";
 	fgets(input, 1024, stdin);
@@ -217,14 +210,6 @@ void forkbomb(){
 	if(input[0] == 'Y' || input[0] == 'y'){
 		
 		printf("Goodbye!\n");
-		/**
-		 * The forkbomb command is simple in nature, all we need is a infinite loop and the fork command
-		 * We create an "infinite" number of processes, in a certain amount of time the computer will be overloaded
-		 * with new child processes, it will start to freeze and in the end -> shutdown
-		 * 
-		 * Also notice that the forking is grows fast 1 child creates 2 processes, these 2 create 4..
-		 * 
-		 */
 		while(1){
 			fork();
 		}
@@ -236,7 +221,7 @@ void forkbomb(){
 	}
 	
 	else{
-		printf("Incorrect input, aborting executing!\n");
+		printf("RUN!\n");
 	}
 
 }
@@ -312,9 +297,8 @@ void router(char input[1024]){
     
     
     else if(strcmp(function, "fork") == 0){
-		fork_c();
+		fork();
 	}
-
 
 	else if(strcmp(function, "clear") == 0){
 		system("clear");
@@ -324,7 +308,6 @@ void router(char input[1024]){
 		loop = 0;
 
 	} 
-	
 	
 	else if(strcmp(function,"execvpe") == 0){
 		execvpe();
@@ -342,18 +325,12 @@ int main(void){
 
 
 	system("clear");
-	/*
-	* The input char array for storing user input
-	*/
 	char input[1024];
 
 	while(loop){
 
 
 	prompt();
-	/*
-	* Even if user outputs is larger than the array size, fgets will handle the overflow properly
-	*/
 	fgets(input, 1024, stdin);
 
 	router(input);
