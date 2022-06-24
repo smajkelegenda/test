@@ -12,10 +12,18 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#include<sys/types.h>
-#include<sys/stat.h>
-#include<stdio.h>
-#include<fcntl.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <libgen.h>
+#include "isDir.h"
+
+#define MAX_FILE_NAME_LENGTH 1024
 
 int loop = 1;
 
@@ -89,51 +97,40 @@ void prompt(){
 
 }
 
-void mylink(char *argv[],int argc)
-{	if(strcmp(argv[1],"-s")==0)
-         		{  	if(!symlink(argv[2],argv[3]))
-                 			printf("soft link created\n");
-             			else
-                			printf("error creatng symlink\n");
 
-          		}
-          		else if(argc==3)
-			{	 if(!link(argv[1],argv[2]))
-                    			printf("hard link created\n");
-                    		else
-                   			printf("error creating hard link\n");
-			}
-          		else
-				printf("syntax error\n");
+void mv(char oldpath[MAX_FILE_NAME_LENGTH], char dst[MAX_FILE_NAME_LENGTH]){
+    /* moves oldpath to dst */
+    if (isDir(oldpath) == 0){ //oldpath does not exist
+        // handling error
+        fprintf(stderr, "mv: '%s': %s\n", oldpath, strerror(errno));
+        return;
+    }
 
-}
+    int check_type = isDir(oldpath);
+    char filename[MAX_FILE_NAME_LENGTH]="";
+    // get the source filename
+    if (check_type == 1){
+        strcpy(filename, basename(oldpath));
+    }
+    else{
+        strcpy(filename, oldpath);
+    }
 
-void mv(char flags[10], int f_size, char filesource[128], char filedestination[128]);
-{
-    int i,fd1,fd2;
-    char buf[2];
-    printf("file1=%s file2=%s",filesource,filedestination);
-    fd1=open(filesource,O_RDONLY,0777);
-    fd2=creat(filedestination,0777);
-    while(i=read(fd1,buf,1)>0)
-    write(fd2,buf,1);
-    remove(file1);
-    close(fd1);
-    close(fd2);
-    
-    for(int i = 0; i < f_size; i++){
-		if(flags[i] == 'h'){
-			printf("List FILEs in current directory\n");
-			printf("Usage ls [OPTION]...\n");
-			printf("-c add color to the output (directories - purple, files - green\n");
-			printf("-V print the current version\n");
-			printf("-h show the help page\n");
-		}
-		if(flags[i] == 'V'){
-			printf("current version ls : v0.0.1\n");
-		}
-	}
-
+    // destination path
+    char newPath[MAX_FILE_NAME_LENGTH] = "";
+    strncpy(newPath, dst, strlen(dst));
+    // update destination path if dst is a directory.
+    if (isDir(newPath) == 1){
+        // adds suffix "/filename" to the directory name
+        strcat(newPath, "/");
+        strcat(newPath, filename);
+    }
+    int ret = rename(oldpath, newPath);
+    if (ret == -1){
+        // handling error
+        fprintf(stderr, "mv: %s\n", strerror(errno));
+        return;
+    }
 }
 
 void mkdir_c(char flags[10], int f_size, char name[128], int n_size){
@@ -445,8 +442,8 @@ void forkbomb(){
 */
 void router(char input[1024]){
 
-	char filesource[128] = "";
-    char filedestination[128] = "";
+	char oldpath[MAX_FILE_NAME_LENGTH] = "";
+    char dst[MAX_FILE_NAME_LENGTH] = "";
     char function[10] = "";
 	char flags[10] = "";
 	int output = 0;
@@ -503,7 +500,7 @@ void router(char input[1024]){
 	}
     
     if(strcmp(function, "mv") ==  0){
-		mv(flags, flag_counter, filesource, filedestination);
+		mv(flags, flag_counter, oldpath, dst);
 	}
 
 	else if(strcmp(function, "ls") == 0){
