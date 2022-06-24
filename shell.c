@@ -11,6 +11,7 @@
 #include <libgen.h>
 #include <signal.h>
 #include <sys/wait.h>
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -20,7 +21,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <ustat.h>
 #include <time.h>
 #include <utime.h>
 #include <grp.h>
@@ -532,7 +532,7 @@ void router(char input[1024]){
 		loop = 0;
 
 	}
-    else if(strcmp(argv[0],"mv")==0){
+    else if(strcmp(function,"mv")==0){
         mv(argv,argc);
     }
 	
