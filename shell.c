@@ -12,6 +12,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+
 int loop = 1;
 
 /*
@@ -81,6 +82,25 @@ void prompt(){
 	reset();
 
 	printf("$ ");
+
+}
+
+void mylink(char *argv[],int argc)
+{	if(strcmp(argv[1],"-s")==0)
+         		{  	if(!symlink(argv[2],argv[3]))
+                 			printf("soft link created\n");
+             			else
+                			printf("error creatng symlink\n");
+
+          		}
+          		else if(argc==3)
+			{	 if(!link(argv[1],argv[2]))
+                    			printf("hard link created\n");
+                    		else
+                   			printf("error creating hard link\n");
+			}
+          		else
+				printf("syntax error\n");
 
 }
 
