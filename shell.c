@@ -12,10 +12,6 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#include "types.h"
-#include "stat.h"
-#include "user.h"
-#include "fs.h"
 #include "fcntl.h"
 
 int loop = 1;
@@ -90,17 +86,35 @@ void prompt(){
 
 }
 
-void
-mv(char *from,char *to)
+void mylink(char *argv[],int argc)
+{	if(strcmp(argv[1],"-s")==0)
+         		{  	if(!symlink(argv[2],argv[3]))
+                 			printf("soft link created\n");
+             			else
+                			printf("error creatng symlink\n");
+
+          		}
+          		else if(argc==3)
+			{	 if(!link(argv[1],argv[2]))
+                    			printf("hard link created\n");
+                    		else
+                   			printf("error creating hard link\n");
+			}
+          		else
+				printf("syntax error\n");
+
+}
+
+void mv(char flags[10], int f_size, char filesource[128], char filedestination[128]);
 {
-    struct stat st;
+	struct stat st;
     char *buf;
     buf=(char*)malloc(512*sizeof(char));
     int fd0;
     // OPEN FILE FROM
-    if((fd0=open(from,O_RDONLY))<0)
+    if((fd0=open(filesource,O_RDONLY))<0)
     {
-        printf(2,"mv: cannot open '%s' No such file or directory\n",from);
+        printf(2,"mv: cannot open '%s' No such file or directory\n",filesource);
         exit();
     }
     // JIKA ADALAH DIREKTORI
@@ -108,7 +122,7 @@ mv(char *from,char *to)
     {
         if(st.type==T_DIR)
         {
-            printf(2,"mv: cannot copy directory '%s'\n",from);
+            printf(2,"mv: cannot copy directory '%s'\n",filesource);
             exit();
         }
     }
@@ -118,15 +132,15 @@ mv(char *from,char *to)
     temp=(char*)malloc(512*sizeof(char));
     if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
     // OPEN FILE TO
-    fd1=open(to,0);
+    fd1=open(filedestination,0);
     if(1)
     {
         // JIKA ADALAH DIREKTORI
         if(fstat(fd1,&st)>=0 && st.type == T_DIR)
         {
-            strcat(temp,to);
+            strcat(temp,filedestination);
             strcat(temp,"/");
-            strcat(temp,from);
+            strcat(temp,filesource);
             close(fd1);
             if((fd1=open(temp,O_CREAT | O_TRUNC | O_WRONLY))<0)
             {
@@ -139,7 +153,7 @@ mv(char *from,char *to)
             close(fd1);
             if((fd1=open(to,O_CREAT | O_TRUNC | O_WRONLY))<0)
             {
-                printf(2,"mv: error while create '%s'\n",to);
+                printf(2,"mv: error while create '%s'\n",filedestination);
                 exit();
             }
         }
@@ -152,7 +166,21 @@ mv(char *from,char *to)
     close(fd1);
     free(temp);
     free(buf);
-    unlink(from);
+    unlink(filesource);
+    
+    for(int i = 0; i < f_size; i++){
+		if(flags[i] == 'h'){
+			printf("List FILEs in current directory\n");
+			printf("Usage ls [OPTION]...\n");
+			printf("-c add color to the output (directories - purple, files - green\n");
+			printf("-V print the current version\n");
+			printf("-h show the help page\n");
+		}
+		if(flags[i] == 'V'){
+			printf("current version ls : v0.0.1\n");
+		}
+	}
+
 }
 
 void mkdir_c(char flags[10], int f_size, char name[128], int n_size){
@@ -464,11 +492,11 @@ void forkbomb(){
 */
 void router(char input[1024]){
 
+	char filesource[128] = "";
+    char filedestination[128] = "";
     char function[10] = "";
 	char flags[10] = "";
 	int output = 0;
-    char from="";
-    char to="";
 	char file_name[128] = "";
 	int fun_counter = 0;
 	int flag_counter = 0;
@@ -522,7 +550,7 @@ void router(char input[1024]){
 	}
     
     if(strcmp(function, "mv") ==  0){
-		mv(from,to);
+		mv(flags, flag_counter, filesource, filedestination);
 	}
 
 	else if(strcmp(function, "ls") == 0){
