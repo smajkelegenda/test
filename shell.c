@@ -13,6 +13,8 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 int loop = 1;
 
@@ -96,7 +98,7 @@ void date() {
     printf("System Time is: %02d:%02d:%02d\n", tm.tm_hour, tm.tm_min, tm.tm_sec);
 }
 
-/*
+
 
 void rev(char file_name[128]) {
 	FILE *fp;
@@ -107,8 +109,6 @@ void rev(char file_name[128]) {
     if(!fp)
     {
         printf("Error in opening the file...\nExiting...");
-        getch();
-        return 0;
     }
     printf("\nThe original content is:\n\n");
     ch = getc(fp);
@@ -128,60 +128,36 @@ void rev(char file_name[128]) {
         printf("%c", ch);
     }
     printf("\n");
-    getch();
 }
 
-void mv(char file_name1[128], char file_name2[128])
+
+
+void mv(char flags[10], int f_size, char file_name1[128], char file_name2[128])
 {
 	int i,fd1,fd2;
 	char buf[2];
-	file1=file_name1;
-	file2=file_name2;
-	printf("file1=%s file2=%s",file1,file2);
-	fd1=open(file1,O_RDONLY,0777);
-	fd2=creat(file2,0777);
+	printf("file1=%s file2=%s",file_name1,file_name2);
+	fd1=open(file_name1,O_RDONLY,0777);
+	fd2=creat(file_name2,0777);
 	while(i=read(fd1,buf,1)>0)
 	write(fd2,buf,1);
-	remove(file1);
+	remove(file_name1);
 	close(fd1);
 	close(fd2);
-}
-
-void waitpid() {
-	int pid;
-    int status;
-    pid =fork();
-    if(pid<0){
-        printf("Error");
-    }
-    else if(pid==0){
-         // Child Process
-         for(int i=0;i<100;i++){
-            value-=1;
-            printf("%d \n",value);
-         }
-        exit(EXIT_SUCCESS);
-    }
-	
-   waitpid(pid,&status,0); // WAIT till child gets over
-	// Parent process
-   for(int i=0;i<100;i++){
-            value-=1;
-            printf("%d \n",value);
-         }
-   printingFunction();
-    if (WIFSIGNALED(status)){
-        printf("Error\n");
-    }
-    else if (WEXITSTATUS(status)){
-        printf("Exited Normally\n");
-    }
-    return 0;
     
+    // flags
+	for(int i = 0; i < f_size; i++){
+
+		if(flags[i] == 'h'){
+			printf("mv change name or move file/directory do another destination");
+			printf("to rename directory use mv directory1 directory2");
+			printf("to rename file use mv file1 file2");
+			printf("to move directory use mv directory1 directory2 (if both directories exist)");
+		}
 	}
 }
 
-*/
+
 
 void fork_c(){
 
@@ -200,13 +176,10 @@ void fork_c(){
 	}
 }
 
-void execvpe() {
+int execvpe() {
 	char* command = "ls";
     char* argument_list[] = {"ls", "-l", NULL};
  
-    printf("Before calling execvp()\n");
- 
-    printf("Creating another process using fork()...\n");
  
     if (fork() == 0) {
         // Newly spawned child Process. This will be taken over by "ls -l"
@@ -220,8 +193,6 @@ void execvpe() {
         }
     }
     else {
-        // Old Parent process. The C program will come here
-        printf("This line will be printed\n");
     }
  
     return 0;
@@ -329,17 +300,16 @@ void router(char input[1024]){
 		date();
 	}
     
-    /*
 
 	else if(strcmp(function, "rev") == 0){
 		rev(file_name);
 	}
-
+	
+	
 	else if(strcmp(function, "mv") == 0){
-		mv(file_name, file_name2);
+		mv(flags, flag_counter,file_name, file_name2);
 	}
     
-    */
     
     else if(strcmp(function, "fork") == 0){
 		fork_c();
@@ -390,15 +360,4 @@ int main(void){
 	}
 
 	return 0;
-}Task 1.5:
-
-/*
-The purpose of fork() is to create a new process, which becomes the child process of the caller. After a new child process is created, both processes will execute the next instruction following the fork() system call.
-int i = 1; 
-while (i < 100) { i++; } 
-printf("%d ", i); 
-while (i > 0) { i--; }
-printf("%d ", i);
-In this code, process goes from executing 1st while loop and then terminating it. During this period 2nd while loop is ready and is waiting to start executing, when first loop is terminated then second one begins until condition is fulfilled. During this time first loop is terminated, after second loop is done it’s also terminated.
-
-*/
+}
