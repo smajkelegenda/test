@@ -456,10 +456,9 @@ void forkbomb(){
  * Function used for routing user input, it can be though as the "heart" of the shell, since it
  * reads the user input, intreprets it and calls the wanted function.
 */
-void router(char input[1024]){
+void router(int argc, char* argv[]){
 
-	char oldpath[MAX_FILE_NAME_LENGTH] = "";
-    char dst[MAX_FILE_NAME_LENGTH] = "";
+
     char function[10] = "";
 	char flags[10] = "";
 	int output = 0;
@@ -516,7 +515,13 @@ void router(char input[1024]){
 	}
     
     if(strcmp(function, "mv") ==  0){
-		mv(flags, flag_counter, oldpath, dst);
+		char* dst= argv[argc-1]; // dst_dir
+        char pathname[MAX_FILE_NAME_LENGTH] = ""; // source path
+        for (int i=1; i<argc-1; i++){
+            strncpy(pathname, argv[i], strlen(argv[i]));
+            // move from pathname to dst
+            mv(pathname, dst);
+        }
 	}
 
 	else if(strcmp(function, "ls") == 0){
