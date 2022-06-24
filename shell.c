@@ -12,7 +12,10 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#include "fcntl.h"
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<stdio.h>
+#include<fcntl.h>
 
 int loop = 1;
 
@@ -107,66 +110,16 @@ void mylink(char *argv[],int argc)
 
 void mv(char flags[10], int f_size, char filesource[128], char filedestination[128]);
 {
-	struct stat st;
-    char *buf;
-    buf=(char*)malloc(512*sizeof(char));
-    int fd0;
-    // OPEN FILE FROM
-    if((fd0=open(filesource,O_RDONLY))<0)
-    {
-        printf(2,"mv: cannot open '%s' No such file or directory\n",filesource);
-        exit();
-    }
-    // JIKA ADALAH DIREKTORI
-    if(fstat(fd0,&st)>=0)
-    {
-        if(st.type==T_DIR)
-        {
-            printf(2,"mv: cannot copy directory '%s'\n",filesource);
-            exit();
-        }
-    }
-
-    int fd1;
-    char *temp;
-    temp=(char*)malloc(512*sizeof(char));
-    if(to[strlen(to)-1]=='/') to[strlen(to)-1]=0;
-    // OPEN FILE TO
-    fd1=open(filedestination,0);
-    if(1)
-    {
-        // JIKA ADALAH DIREKTORI
-        if(fstat(fd1,&st)>=0 && st.type == T_DIR)
-        {
-            strcat(temp,filedestination);
-            strcat(temp,"/");
-            strcat(temp,filesource);
-            close(fd1);
-            if((fd1=open(temp,O_CREAT | O_TRUNC | O_WRONLY))<0)
-            {
-                printf(2,"mv: error while create '%s'\n",temp);
-                exit();
-            }
-        }
-        // JIKA ADALAH FILE
-        else{
-            close(fd1);
-            if((fd1=open(to,O_CREAT | O_TRUNC | O_WRONLY))<0)
-            {
-                printf(2,"mv: error while create '%s'\n",filedestination);
-                exit();
-            }
-        }
-    }
-    int n;
-    while((n=read(fd0,buf,sizeof(buf)))>0)
-    {
-        printf(fd1,"%s",buf);
-    }
+    int i,fd1,fd2;
+    char buf[2];
+    printf("file1=%s file2=%s",filesource,filedestination);
+    fd1=open(filesource,O_RDONLY,0777);
+    fd2=creat(filedestination,0777);
+    while(i=read(fd1,buf,1)>0)
+    write(fd2,buf,1);
+    remove(file1);
     close(fd1);
-    free(temp);
-    free(buf);
-    unlink(filesource);
+    close(fd2);
     
     for(int i = 0; i < f_size; i++){
 		if(flags[i] == 'h'){
