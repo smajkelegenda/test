@@ -48,9 +48,9 @@ void reset(){
 void prompt(){
 
 	char *username;
-	char hostname[HOST_NAME_MAX + 1]; 
+	char hostname[HOST_NAME_MAX + 1]; // host names are limited to (HOST_NAME_MAX) bytes
 	
-	username = getlogin(); r
+	username = getlogin(); // included in unistd.h, it returns the login name of the user
 	gethostname(hostname, HOST_NAME_MAX + 1); 
 
 	char cwd[PATH_MAX]; 
@@ -67,9 +67,9 @@ void prompt(){
 	purple();
 	printf("%s", hostname);
 
-    if (getcwd(cwd, sizeof(cwd)) != NULL) { 
+    if (getcwd(cwd, sizeof(cwd)) != NULL) { // getcwd() returns an absolute pathname of the current working directory
 	cyan();
-	printf(" %s", basename(cwd)); 
+	printf(" %s", basename(cwd)); // basename() returns the final component of the pathname, deleting any trailing '/' characters
 	}
 	else{
 		perror("getcwd() error");
@@ -133,7 +133,6 @@ void mv(char flags[10], int f_size, char file_name1[128], char file_name2[128])
 {
 	int i,fd1,fd2;
 	char buf[2];
-	printf("file1=%s file2=%s",file_name1,file_name2);
 	fd1=open(file_name1,O_RDONLY,0777);
 	fd2=creat(file_name2,0777);
 	while(i=read(fd1,buf,1)>0)
@@ -146,10 +145,10 @@ void mv(char flags[10], int f_size, char file_name1[128], char file_name2[128])
 	for(int i = 0; i < f_size; i++){
 
 		if(flags[i] == 'h'){
-			printf("mv change name or move file/directory do another destination");
-			printf("to rename directory use mv directory1 directory2");
-			printf("to rename file use mv file1 file2");
-			printf("to move directory use mv directory1 directory2 (if both directories exist)");
+			printf("mv change name or move file/directory do another destination\n");
+			printf("to rename directory use mv directory1 directory2\n");
+			printf("to rename file use mv file1 file2\n");
+			printf("to move directory use mv directory1 directory2 (if both directories exist)\n");
 		}
 	}
 }
